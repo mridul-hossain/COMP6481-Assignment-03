@@ -52,15 +52,28 @@ public class Directory {
     }
 
     public void printDirectoryStructure() {
+        System.out.println(name);
+        printDirectoryStructureHelper("\t");
+    }
+
+    private void printDirectoryStructureHelper(String space) {
         for (Directory child : children) {
-            if(child.isFile){
-                System.out.println(space + child.name);
-            }else{
-                System.out.println(space + child.name);
-                System.out.print("\t");
-                child.printDirectoryStructure();
+            System.out.println(space + child.name);
+            if (!child.isFile) {
+                child.printDirectoryStructureHelper(space + "\t");
             }
         }
+    }
+
+    public int getSize() {
+        if (isFile) {
+            return 1; // Each file has a size of 1
+        }
+        int totalSize = 0;
+        for (Directory child : children) {
+            totalSize += child.getSize();
+        }
+        return totalSize;
     }
 
     public int getIndexNumber(String name){
@@ -71,5 +84,23 @@ public class Directory {
             }
         }
         return indexNumber;
+    }
+
+    public String findFile(String fileName, String currentPath) {
+        if (isFile && name.equals(fileName)) {
+            return currentPath + "/" + name;
+        } else if (!isFile) {
+            for (Directory child : children) {
+                String result = child.findFile(fileName, currentPath + "/" + name);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
+    public String findFile(String fileName) {
+        return findFile(fileName, "");
     }
 }
